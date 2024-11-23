@@ -75,12 +75,31 @@ namespace vms.Controllers
 
         // Get all applications for a specific organization
         [HttpGet("organization/{organizationId}/applications")]
-        public async Task<ActionResult<List<VolunteerApplication>>> GetApplicationsForOrganization(int organizationId)
+        public async Task<ActionResult<List<object>>> GetApplicationsForOrganization(int organizationId)
         {
             var applications = await _context.VolunteerApplications
                 .Include(a => a.User)
                 .Include(a => a.VolunteerOpportunity)
                 .Where(a => a.VolunteerOpportunity.OrganizationId == organizationId)
+                .Select(a => new
+                {
+                    ApplicationId = a.Id,
+                    User = new
+                    {
+                        a.User.Id,
+                        a.User.Name,
+                        a.User.Surname,
+                        a.User.Email
+                    },
+                    Opportunity = new
+                    {
+                        a.VolunteerOpportunity.Id,
+                        a.VolunteerOpportunity.Title,
+                        a.VolunteerOpportunity.Description
+                    },
+                    a.IsAccepted,
+                    a.Feedback
+                })
                 .ToListAsync();
 
             if (applications == null || applications.Count == 0)
@@ -90,6 +109,7 @@ namespace vms.Controllers
 
             return Ok(applications);
         }
+
         [HttpGet("user/{userId}/applications")]
         public async Task<ActionResult<List<VolunteerApplication>>> GetUserApplications(int userId)
         {
@@ -135,6 +155,54 @@ namespace vms.Controllers
 
             return Ok(new { Applied = false, Message = "User has not applied for this opportunity." });
         }
+        [HttpGet("organization/{organizationId}/all-applicants")]
+        public async Task<ActionResult<List<object>>> GetAllApplicantsForOrganization(int organizationId)
+        {
+            var opportunityIds = await _context.VolunteerOpportunities
+                .Where(o => o.OrganizationId == organizationId)
+                .Select(o => o.Id)
+                .ToListAsync();
+
+            if (!opportunityIds.Any())
+            {
+                return NotFound($"No opportunities found for organizationId: {organizationId}");
+            }
+
+            var allApplicants = await _context.VolunteerApplications
+                .Include(a => a.User)
+                .Include(a => a.VolunteerOpportunity)
+                .Where(a => opportunityIds.Contains(a.VolunteerOpportunityId))
+                .Select(a => new
+                {
+                    OpportunityId = a.VolunteerOpportunityId,
+                    Applicant = new
+                    {
+                        a.User.Id,
+                        a.User.Name,
+                        a.User.Email,
+                        a.IsAccepted
+                    }
+                })
+                .ToListAsync();
+
+            if (!allApplicants.Any())
+            {
+                return NotFound($"No applicants found for the organization's opportunities.");
+            }
+
+            // Group by opportunity ID for easier organization
+            var groupedApplicants = allApplicants
+                .GroupBy(a => a.OpportunityId)
+                .Select(group => new
+                {
+                    OpportunityId = group.Key,
+                    Applicants = group.Select(a => a.Applicant).ToList()
+                })
+                .ToList();
+
+            return Ok(groupedApplicants);
+        }
+
 
     }
 }

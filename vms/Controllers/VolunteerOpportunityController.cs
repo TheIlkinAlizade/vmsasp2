@@ -109,7 +109,7 @@ namespace vms.Controllers
                 return NotFound("Opportunity not found.");
             }
 
-            return Ok(opportunity.Title); 
+            return Ok(opportunity.Title);
         }
 
     }

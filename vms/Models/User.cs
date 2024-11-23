@@ -15,6 +15,9 @@ namespace vms.Models
         public string Password { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? CV { get; set; }  // Optional
+        public string? Phone { get; set; }  // Optional
+        public string? Address { get; set; }  // Optional
+
         public string? Experience { get; set; }  // Optional
         public bool IsOrganization { get; set; }  // To distinguish between user and organization accounts
         public List<VolunteerApplication>? VolunteerApplications { get; set; }

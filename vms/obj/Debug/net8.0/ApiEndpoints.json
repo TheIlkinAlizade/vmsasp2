@@ -135,9 +135,92 @@
     ]
   },
   {
-    "ContainingType": "FeedbacksController",
-    "Method": "CreateFeedback",
-    "RelativePath": "api/Feedbacks",
+    "ContainingType": "vms.Controllers.FeedbackController",
+    "Method": "GetFeedbackById",
+    "RelativePath": "api/Feedback/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "vms.Models.Feedback",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "vms.Controllers.FeedbackController",
+    "Method": "GetFeedbackForUserInOpportunity",
+    "RelativePath": "api/Feedback/opportunity/{opportunityId}/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "opportunityId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "vms.Models.Feedback",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "vms.Controllers.FeedbackController",
+    "Method": "GetFeedbacksByOrganization",
+    "RelativePath": "api/Feedback/organization/{organizationId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "organizationId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Linq.IQueryable\u00601[[vms.Models.Feedback, vms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "vms.Controllers.FeedbackController",
+    "Method": "SubmitFeedback",
+    "RelativePath": "api/Feedback/submit",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -161,93 +244,9 @@
     ]
   },
   {
-    "ContainingType": "FeedbacksController",
-    "Method": "UpdateFeedback",
-    "RelativePath": "api/Feedbacks/{id}",
-    "HttpMethod": "PATCH",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "feedback",
-        "Type": "vms.Models.Feedback",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FeedbacksController",
-    "Method": "DeleteFeedback",
-    "RelativePath": "api/Feedbacks/{id}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FeedbacksController",
-    "Method": "SendFeedback",
-    "RelativePath": "api/Feedbacks/feedback/{id}",
-    "HttpMethod": "PATCH",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "feedback",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FeedbacksController",
-    "Method": "GetFeedbackByOpportunity",
-    "RelativePath": "api/Feedbacks/opportunity/{opportunityId}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "opportunityId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[vms.Models.Feedback, vms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "FeedbacksController",
-    "Method": "GetFeedbackByUser",
-    "RelativePath": "api/Feedbacks/user/{userId}",
+    "ContainingType": "vms.Controllers.FeedbackController",
+    "Method": "GetFeedbacksForUser",
+    "RelativePath": "api/Feedback/user/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -258,17 +257,7 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[vms.Models.Feedback, vms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
     "ContainingType": "vms.Controllers.OrganizationController",
@@ -654,6 +643,32 @@
   },
   {
     "ContainingType": "vms.Controllers.VolunteerApplicationController",
+    "Method": "GetAllApplicantsForOrganization",
+    "RelativePath": "api/VolunteerApplication/organization/{organizationId}/all-applicants",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "organizationId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "vms.Controllers.VolunteerApplicationController",
     "Method": "GetApplicationsForOrganization",
     "RelativePath": "api/VolunteerApplication/organization/{organizationId}/applications",
     "HttpMethod": "GET",
@@ -668,7 +683,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[vms.Models.VolunteerApplication, vms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

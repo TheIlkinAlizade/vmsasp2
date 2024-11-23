@@ -5156,11 +5156,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Helix\\Downloads\\VMS_ASP.NET-main\\VMS_ASP.NET-main\\vms\\vms.csproj",
+      "projectUniqueName": "C:\\Users\\Helix\\Downloads\\game\\v2\\VMS_ASP.NET-main\\vms\\vms.csproj",
       "projectName": "vms",
-      "projectPath": "C:\\Users\\Helix\\Downloads\\VMS_ASP.NET-main\\VMS_ASP.NET-main\\vms\\vms.csproj",
+      "projectPath": "C:\\Users\\Helix\\Downloads\\game\\v2\\VMS_ASP.NET-main\\vms\\vms.csproj",
       "packagesPath": "C:\\Users\\Helix\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Helix\\Downloads\\VMS_ASP.NET-main\\VMS_ASP.NET-main\\vms\\obj\\",
+      "outputPath": "C:\\Users\\Helix\\Downloads\\game\\v2\\VMS_ASP.NET-main\\vms\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Helix\\AppData\\Roaming\\NuGet\\NuGet.Config",

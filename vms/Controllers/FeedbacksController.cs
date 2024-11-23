@@ -2,125 +2,112 @@
 using Microsoft.EntityFrameworkCore;
 using vms.Data;
 using vms.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
-[Route("api/[controller]")]
-[ApiController]
-public class FeedbacksController : ControllerBase
+namespace vms.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public FeedbacksController(ApplicationDbContext context)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class FeedbackController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
 
-    // Get all feedback for a specific opportunity
-    [HttpGet("opportunity/{opportunityId}")]
-    public async Task<ActionResult<IEnumerable<Feedback>>> GetFeedbackByOpportunity(int opportunityId)
-    {
-        var feedbacks = await _context.Feedbacks
-            .Include(f => f.User)
-            .Where(f => f.OpportunityId == opportunityId)
-            .ToListAsync();
-
-        if (!feedbacks.Any())
+        public FeedbackController(ApplicationDbContext context)
         {
-            return NotFound("No feedback found for this opportunity.");
+            _context = context;
         }
 
-        return feedbacks;
-    }
-
-    // Get all feedback by a specific user
-    [HttpGet("user/{userId}")]
-    public async Task<ActionResult<IEnumerable<Feedback>>> GetFeedbackByUser(int userId)
-    {
-        var feedbacks = await _context.Feedbacks
-            .Include(f => f.Opportunity)
-            .Where(f => f.UserId == userId)
-            .ToListAsync();
-
-        if (!feedbacks.Any())
+        // Submit feedback about a user for a specific opportunity
+        [HttpPost("submit")]
+        public async Task<ActionResult<Feedback>> SubmitFeedback([FromBody] Feedback feedback)
         {
-            return NotFound("No feedback found for this user.");
-        }
+            // Verify the organization owns the opportunity
+            var opportunity = await _context.VolunteerOpportunities
+                .FirstOrDefaultAsync(o => o.Id == feedback.OpportunityId && o.OrganizationId == feedback.OrganizationId);
 
-        return feedbacks;
-    }
+            if (opportunity == null)
+            {
+                return BadRequest("You are not authorized to give feedback for this opportunity.");
+            }
 
-    // Create new feedback
-    [HttpPost]
-    public async Task<ActionResult<Feedback>> CreateFeedback([FromBody] Feedback feedback)
-    {
-        if (feedback == null)
-        {
-            return BadRequest("Invalid feedback data.");
-        }
+            // Verify the user was accepted for this opportunity
+            var application = await _context.VolunteerApplications
+                .FirstOrDefaultAsync(a => a.UserId == feedback.UserId && a.VolunteerOpportunityId == feedback.OpportunityId && a.IsAccepted);
 
-        _context.Feedbacks.Add(feedback);
-        await _context.SaveChangesAsync();
+            if (application == null)
+            {
+                return BadRequest("The user was not accepted for this opportunity.");
+            }
 
-        return CreatedAtAction(nameof(GetFeedbackByUser), new { userId = feedback.UserId }, feedback);
-    }
-
-    // Update feedback
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> UpdateFeedback(int id, [FromBody] Feedback feedback)
-    {
-        if (id != feedback.Id)
-        {
-            return BadRequest("Feedback ID mismatch.");
-        }
-
-        _context.Entry(feedback).State = EntityState.Modified;
-
-        try
-        {
+            // Save feedback
+            feedback.CreatedAt = DateTime.Now;
+            _context.Feedbacks.Add(feedback);
             await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetFeedbackById), new { id = feedback.Id }, feedback);
         }
-        catch (DbUpdateConcurrencyException)
+
+        // Get feedback by ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Feedback>> GetFeedbackById(int id)
         {
-            if (!_context.Feedbacks.Any(f => f.Id == id))
+            var feedback = await _context.Feedbacks
+                .FirstOrDefaultAsync(f => f.Id == id);
+
+            if (feedback == null)
             {
                 return NotFound("Feedback not found.");
             }
-            else
+
+            return Ok(feedback);
+        }
+
+        // Get all feedbacks given by an organization
+        [HttpGet("organization/{organizationId}")]
+        public async Task<ActionResult<IQueryable<Feedback>>> GetFeedbacksByOrganization(int organizationId)
+        {
+            var feedbacks = await _context.Feedbacks
+                .Where(f => f.OrganizationId == organizationId)
+                .ToListAsync();
+
+            return Ok(feedbacks);
+        }
+
+        // Get feedback about a specific user for a specific opportunity
+        [HttpGet("opportunity/{opportunityId}/user/{userId}")]
+        public async Task<ActionResult<Feedback>> GetFeedbackForUserInOpportunity(int opportunityId, int userId)
+        {
+            var feedback = await _context.Feedbacks
+                .FirstOrDefaultAsync(f => f.OpportunityId == opportunityId && f.UserId == userId);
+
+            if (feedback == null)
             {
-                throw;
+                return NotFound("Feedback not found for this user in this opportunity.");
             }
+
+            return Ok(feedback);
         }
 
-        return NoContent();
-    }
-
-    // Delete feedback
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteFeedback(int id)
-    {
-        var feedback = await _context.Feedbacks.FindAsync(id);
-        if (feedback == null)
+        [HttpGet("user/{userId}")]
+        public IActionResult GetFeedbacksForUser(int userId)
         {
-            return NotFound("Feedback not found.");
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID" });
+            }
+
+            var feedbacks = _context.Feedbacks
+                .Where(f => f.UserId == userId)
+                .ToList();
+
+            if (feedbacks == null || !feedbacks.Any())
+            {
+                return NotFound(new { message = "No feedbacks found for the specified user ID" });
+            }
+
+            return Ok(feedbacks);
         }
 
-        _context.Feedbacks.Remove(feedback);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
     }
-    [HttpPatch("feedback/{id}")]
-    public async Task<IActionResult> SendFeedback(int id, [FromBody] string feedback)
-    {
-        var application = await _context.VolunteerApplications.FindAsync(id);
-        if (application == null || !application.IsAccepted)
-        {
-            return BadRequest("Feedback can only be sent to accepted applicants.");
-        }
-
-        application.Feedback = feedback;
-        await _context.SaveChangesAsync();
-        return Ok("Feedback sent successfully.");
-    }
-
-
 }

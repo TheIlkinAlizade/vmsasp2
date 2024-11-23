@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Fs9gU6Rlvy4=",
+  "dgSpecHash": "Sgdq6YzcQ7g=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Helix\\Downloads\\VMS_ASP.NET-main\\VMS_ASP.NET-main\\vms\\vms.csproj",
+  "projectFilePath": "C:\\Users\\Helix\\Downloads\\game\\v2\\VMS_ASP.NET-main\\vms\\vms.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Helix\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Helix\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

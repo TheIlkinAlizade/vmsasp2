@@ -24,6 +24,11 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     });
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
 // Configure Swagger for API documentation (optional, but useful)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
