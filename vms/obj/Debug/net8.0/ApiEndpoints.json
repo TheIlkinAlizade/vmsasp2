@@ -344,6 +344,22 @@
   },
   {
     "ContainingType": "vms.Controllers.OrganizationController",
+    "Method": "VerifyOrganization",
+    "RelativePath": "api/Organization/{id}/verify",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "vms.Controllers.OrganizationController",
     "Method": "OrganizationLogin",
     "RelativePath": "api/Organization/organization/login",
     "HttpMethod": "POST",
@@ -375,6 +391,26 @@
     "ReturnTypes": [
       {
         "Type": "vms.Models.Organization",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "vms.Controllers.OrganizationController",
+    "Method": "GetVerifiedOrganizations",
+    "RelativePath": "api/Organization/verified",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[vms.Models.Organization, vms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

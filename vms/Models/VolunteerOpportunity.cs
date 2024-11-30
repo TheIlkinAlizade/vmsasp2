@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace vms.Models
 {
@@ -15,6 +16,13 @@ namespace vms.Models
 
         public Organization? Organization { get; set; }
         public int OrganizationId { get; set; }
+        [Required]
+        public int MaxApplicants { get; set; } 
+
+        [NotMapped]
+        public int AcceptedApplicantsCount => VolunteerApplications?.Count(a => a.IsAccepted) ?? 0;
+
+        public string Tag { get; set; }
     }
 
 }

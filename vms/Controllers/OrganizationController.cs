@@ -21,6 +21,7 @@ namespace vms.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<Organization>> RegisterOrganization([FromBody] Organization organization)
         {
+            organization.Verified = false;
             _context.Organizations.Add(organization);
             await _context.SaveChangesAsync();
             return Ok(organization);
@@ -86,6 +87,30 @@ namespace vms.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}/verify")]
+        public async Task<IActionResult> VerifyOrganization(int id)
+        {
+            var organization = await _context.Organizations.FindAsync(id);
+            if (organization == null)
+            {
+                return NotFound(new { Message = "Organization not found" });
+            }
+
+            organization.Verified = true;
+            _context.Entry(organization).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500, new { Message = "An error occurred while verifying the organization." });
+            }
+
+            return Ok(new { Message = "Organization verified successfully" });
+        }
+
         // Delete an organization
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganization(int id)
@@ -99,6 +124,11 @@ namespace vms.Controllers
             _context.Organizations.Remove(organization);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+        [HttpGet("verified")]
+        public async Task<ActionResult<List<Organization>>> GetVerifiedOrganizations()
+        {
+            return await _context.Organizations.Where(o => o.Verified).ToListAsync();
         }
 
     }

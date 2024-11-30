@@ -23,6 +23,20 @@ namespace vms.Controllers
         [HttpPost("apply")]
         public async Task<ActionResult<VolunteerApplication>> ApplyForOpportunity([FromBody] VolunteerApplication application)
         {
+            var opportunity = await _context.VolunteerOpportunities
+                .Include(o => o.VolunteerApplications)
+                .FirstOrDefaultAsync(o => o.Id == application.VolunteerOpportunityId);
+
+            if (opportunity == null)
+            {
+                return NotFound("Opportunity not found.");
+            }
+
+            if (opportunity.VolunteerApplications.Count >= opportunity.MaxApplicants)
+            {
+                return BadRequest("The maximum number of applicants has been reached for this opportunity.");
+            }
+
             var existingApplication = await _context.VolunteerApplications
                 .FirstOrDefaultAsync(a => a.UserId == application.UserId && a.VolunteerOpportunityId == application.VolunteerOpportunityId);
 
@@ -36,6 +50,7 @@ namespace vms.Controllers
 
             return Ok(application);
         }
+
 
         // Get all applications for a specific volunteer opportunity (Organization)
         [HttpGet("applications/{opportunityId}")]
@@ -58,11 +73,25 @@ namespace vms.Controllers
         [HttpPatch("accept/{applicationId}")]
         public async Task<ActionResult> AcceptApplication(int applicationId, [FromBody] bool isAccepted)
         {
-            var application = await _context.VolunteerApplications.FindAsync(applicationId);
+            var application = await _context.VolunteerApplications
+                .Include(a => a.VolunteerOpportunity)
+                .FirstOrDefaultAsync(a => a.Id == applicationId);
 
             if (application == null)
             {
                 return NotFound("Application not found.");
+            }
+
+            var opportunity = application.VolunteerOpportunity;
+
+            if (opportunity == null)
+            {
+                return NotFound("Opportunity not found.");
+            }
+
+            if (isAccepted && opportunity.VolunteerApplications.Count(a => a.IsAccepted) >= opportunity.MaxApplicants)
+            {
+                return BadRequest("The maximum number of accepted applicants has been reached for this opportunity.");
             }
 
             application.IsAccepted = isAccepted;
@@ -70,7 +99,7 @@ namespace vms.Controllers
             _context.VolunteerApplications.Update(application);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // Status code 204: No Content, successful request
+            return NoContent();
         }
 
         // Get all applications for a specific organization

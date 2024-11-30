@@ -8,6 +8,7 @@
         public string Password { get; set; }
         public string? Location { get; set; }
         public string? SocialAccounts { get; set; }
+        public bool Verified { get; set; } 
     }
 
 }
